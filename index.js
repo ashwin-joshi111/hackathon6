@@ -62,7 +62,7 @@ async function updateStatus(){
 
           await conn.sobject("agf__ADM_Work__c").update({ 
             Id : result.records[0].Id,
-            agf__Status__c : 'Updated Account#1003'
+            agf__Status__c : 'Updated Account#1004'
           }, function(err, ret) {
             if (err || !ret.success) { return console.error(err, ret); }
             console.log('Updated Successfully : ' + ret.id);
