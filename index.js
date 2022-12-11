@@ -1,7 +1,7 @@
 const jsforce = require('jsforce');
 const express = require('express'); 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 const SF_LOGIN_URL = 'https://login.salesforce.com'; 
 const USER_NAME = 'ashwin.joshi@mindful-koala-8ppxrs.com'; 
