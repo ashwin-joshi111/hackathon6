@@ -1,7 +1,8 @@
 const path = require('path')
 const jsforce = require('jsforce');
 const express = require('express'); 
-var bodyParser = require('body-parser');  
+//var bodyParser = require('body-parser');  
+//const { request } = require('express');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -26,12 +27,13 @@ conn.login(USER_NAME, PASS_WORD+SF_TOKEN, function(err, userInfo) {
   console.log("Org ID: " + userInfo.organizationId);
 });
 
-var urlencodedParser = bodyParser.urlencoded({ extended: false })  
-app.post('/updatePost',urlencodedParser, (req, res)=>{
+app.use(express.json({extended: true, limit: '1mb'}))
+//var urlencodedParser = bodyParser.urlencoded({ extended: false })  
+app.post('/updatePost', (req, res)=>{
   
   console.log('********************************');
-  console.log(req);
-  res.send("Salesforce updation")
+  console.log(req.body.action)
+  res.send("Salesforce integration")
 })
 app.get('/', (req, res)=>{
   res.send("Salesforce integration")
