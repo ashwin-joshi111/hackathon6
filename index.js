@@ -1,6 +1,7 @@
 const path = require('path')
 const jsforce = require('jsforce');
 const express = require('express'); 
+var bodyParser = require('body-parser');  
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -25,7 +26,10 @@ conn.login(USER_NAME, PASS_WORD+SF_TOKEN, function(err, userInfo) {
   console.log("Org ID: " + userInfo.organizationId);
 });
 
-
+var urlencodedParser = bodyParser.urlencoded({ extended: false })  
+app.post('/updatePost',urlencodedParser, (req, res)=>{
+  res.send("Salesforce updation")
+})
 app.get('/', (req, res)=>{
   res.send("Salesforce integration")
 })
