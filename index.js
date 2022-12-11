@@ -28,64 +28,93 @@ conn.login(USER_NAME, PASS_WORD+SF_TOKEN, function(err, userInfo) {
 });
 
 app.use(express.json({extended: true, limit: '1mb'}))
-//var urlencodedParser = bodyParser.urlencoded({ extended: false })  
+
 app.post('/updatePost', (req, res)=>{
   
   console.log('********************************');
   console.log(req.body.action)
-  res.send("Salesforce integration")
+  var canChangeStatus = true
+
+  var action = req.body.action
+  var pullRequest = req.body.pull_request
+  var merged = pullRequest.merged
+  var requestHead = pullRequest.head 
+  var branchName = requestHead.ref
+
+  //res.send("Salesforce integration"+'$'+action+'$'+pullRequest+'$'+merged+'$'+requestHead+'$'+branchName)
+  //Main function 
+  updateStatus(action,merged,branchName,canChangeStatus); 
 })
 app.get('/', (req, res)=>{
   res.send("Salesforce integration")
 })
 app.get('/update', (req, res)=>{
   //Main function 
-  mainFunction(); 
-res.send("Salesforce integration")
+  // mainFunction(); 
+res.send("Salesforce integration update")
 })
 app.listen(PORT, ()=>{
   console.log('Server is running');
 })
 
-
-
-
-
-function mainFunction() {
-
-  console.log('*******************WORKFLOW STARTS***********************')
-  updateStatus(); 
-}
-
-
-async function updateStatus(){
+async function updateStatus(action,merged,branchName,canChangeStatus){
     try {
-        var ticket = 'W-000010'; 
-        //result stores response of query for the product whose name is given by user
-        var result =  await conn.query("SELECT Id, agf__Status__c FROM agf__ADM_Work__c WHERE Name =  '"+ ticket +"'");
-        //console.log(result);
-        if(result.records.length > 0)
-        { //if the result has no records then print this message. 
-          console.log(result);
-
-
-          await conn.sobject("agf__ADM_Work__c").update({ 
-            Id : result.records[0].Id,
-            agf__Status__c : 'Updated Account#1004'
-          }, function(err, ret) {
-            if (err || !ret.success) { return console.error(err, ret); }
-            console.log('Updated Successfully : ' + ret.id);
-          
-          });
-
-
-
-          return true; 
-        }
-      } catch (error) {
-        console.log(error);
+      var ticket = ''; 
+      for(let i=0; i<branchName.length-2; i++)
+      {
+        if(branchName[i] ==='W' &&branchName[i+1]==='-')
+        {
+            ticket='W-'; 
+            for(let j=i+2; j<branchName.length; j++)
+            {
+                if(branchName[j]>='0' && branchName[j]<='9')
+                {
+                    ticket +=branchName[j]; 
+                }
+                else break; 
+            }
+        }  
       }
-    
+      console.log('branchName  -> '+ branchName)
+      console.log('ticket -> '+ ticket)
+      if(ticket.length>0)
+      {
+        var newStatus; 
+        if(action === 'opened' || action ==='reopened')
+        {
+            newStatus = 'Ready for Review'; 
+        }
+        else if(action ==='closed' && merged){
+            newStatus = 'Fixed'; 
+        }
+        else if(action === 'closed' && !merged){
+            newStatus = 'In Progress'; 
+        }
+        else {
+            canChangeStatus = false; 
+        }
+
+        if(canChangeStatus){
+          var result =  await conn.query("SELECT Id, agf__Status__c FROM agf__ADM_Work__c WHERE Name =  '"+ ticket +"'");
+          //console.log(result);
+          if(result.records.length > 0)
+          { //if the result has no records then print this message. 
+            console.log(result);
+  
+            await conn.sobject("agf__ADM_Work__c").update({ 
+              Id : result.records[0].Id,
+              agf__Status__c : newStatus
+            }, function(err, ret) {
+              if (err || !ret.success) { return console.error(err, ret); }
+              console.log('Updated Successfully : ' + ret.id);
+            });
+            return true; 
+          }
+        } 
+      } 
+    } catch (error) {
+        console.log(error);
+      }    
       return false; 
 }
 
