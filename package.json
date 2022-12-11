@@ -9,6 +9,8 @@
   "author": "ashwin",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
     "jsforce": "^1.11.0"
   }
 }
