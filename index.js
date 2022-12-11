@@ -28,6 +28,9 @@ conn.login(USER_NAME, PASS_WORD+SF_TOKEN, function(err, userInfo) {
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false })  
 app.post('/updatePost',urlencodedParser, (req, res)=>{
+  
+  console.log('********************************');
+  console.log(req.body.action);
   res.send("Salesforce updation")
 })
 app.get('/', (req, res)=>{
