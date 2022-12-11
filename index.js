@@ -30,7 +30,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false })
 app.post('/updatePost',urlencodedParser, (req, res)=>{
   
   console.log('********************************');
-  console.log(req.body);
+  console.log(req);
   res.send("Salesforce updation")
 })
 app.get('/', (req, res)=>{
