@@ -26,9 +26,12 @@ conn.login(USER_NAME, PASS_WORD+SF_TOKEN, function(err, userInfo) {
 
 
 app.get('/', (req, res)=>{
-    //Main function 
-    mainFunction(); 
   res.send("Salesforce integration")
+})
+app.get('/update', (req, res)=>{
+  //Main function 
+  mainFunction(); 
+res.send("Salesforce integration")
 })
 app.listen(PORT, ()=>{
   console.log('Server is running');
@@ -58,7 +61,7 @@ async function updateStatus(){
 
           await conn.sobject("agf__ADM_Work__c").update({ 
             Id : result.records[0].Id,
-            agf__Status__c : 'Updated Account#1002'
+            agf__Status__c : 'Updated Account#1003'
           }, function(err, ret) {
             if (err || !ret.success) { return console.error(err, ret); }
             console.log('Updated Successfully : ' + ret.id);
